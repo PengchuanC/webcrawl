@@ -5,4 +5,6 @@
 <p>简单用法:<p/>
 <code>git clone</code>
 <br>
-<code>python -m webcrawl</code>
+<code>cd webcral</code>
+<br>
+<code>python -m scrapy</code>
