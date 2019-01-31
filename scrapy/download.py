@@ -1,8 +1,8 @@
-import time
 import os
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import NoSuchElementException
 import pandas as pd
 
 from scrapy.config import CHROME_DRIVER, FILES
@@ -49,7 +49,7 @@ def save_to_excel(html, name):
     excel.to_excel(f'{path}.xlsx', index=False)
 
 
-def digui(driver, id):
+def recursion_download(driver, id):
     start = 1
     while True:
         try:
@@ -71,12 +71,10 @@ def digui(driver, id):
                         driver.execute_script("window.scrollTo(0, 1600)")
                     elif 'ico_open' in tag_class:
                         name_ex = driver.find_element_by_xpath(f'//*[@id="{tag_id}"]/*[2]').text
-                except Exception as e:
-                    print(e)
+                except NoSuchElementException:
                     pass
-            digui(driver, tag_id)
-        except Exception as e:
-            pass
+            recursion_download(driver, tag_id)
+        except NoSuchElementException:
             break
 
 
@@ -90,16 +88,16 @@ def get_main_class(id):
                 text = driver.find_element_by_xpath(f'//*[@id="{id}"]/*[{start}]').text
                 start += 1
                 yield (tag_id, text)
-            except Exception as e:
-                pass
+            except NoSuchElementException:
                 break
 
 
-main_class = list(get_main_class('treeZhiBiao_1_ul'))
-for _class in main_class:
-    _id, name = _class
-    print(_id, name)
-    make_dir(name)
-    with Chrome() as c:
-        driver = c.driver
-        digui(driver, _id)
+if __name__ == '__main__':
+    main_class = list(get_main_class('treeZhiBiao_1_ul'))
+    for _class in main_class:
+        _id, name = _class
+        print(_id, name)
+        make_dir(name)
+        with Chrome() as c:
+            driver = c.driver
+            recursion_download(driver, _id)
