@@ -49,7 +49,7 @@ def save_to_excel(html, name):
     excel.to_excel(f'{path}.xlsx', index=False)
 
 
-def digui(driver, id):
+def recursion_download(driver, id):
     start = 1
     while True:
         try:
@@ -73,7 +73,7 @@ def digui(driver, id):
                         name_ex = driver.find_element_by_xpath(f'//*[@id="{tag_id}"]/*[2]').text
                 except NoSuchElementException:
                     pass
-            digui(driver, tag_id)
+            recursion_download(driver, tag_id)
         except NoSuchElementException:
             break
 
@@ -95,9 +95,9 @@ def get_main_class(id):
 if __name__ == '__main__':
     main_class = list(get_main_class('treeZhiBiao_1_ul'))
     for _class in main_class:
-        _id, name = _class
-        print(_id, name)
-        # make_dir(name)
-        # with Chrome() as c:
-        #     driver = c.driver
-        #     digui(driver, _id)
+        _id, _name = _class
+        print(_id, _name)
+        make_dir(_name)
+        with Chrome() as c:
+            driver = c.driver
+            recursion_download(driver, _id)
